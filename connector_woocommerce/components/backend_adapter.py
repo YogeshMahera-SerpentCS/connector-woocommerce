@@ -7,7 +7,6 @@ import socket
 import logging
 import xmlrpc.client
 from datetime import datetime
-
 from odoo import http
 from odoo.http import request
 
@@ -65,10 +64,8 @@ class WooAPI(object):
             return
 
     def call(self, method=None, resource=None, arguments=None):
-        print ("arguments.....", arguments)
-        print ("resource..........", resource)
-        print ("method............", method)
         try:
+            print("CALL FROM Backend_adapter-----------------------")
             location = self._location._location
             cons_key = self._location.consumer_key
             sec_key = self._location.consumer_secret
@@ -78,7 +75,8 @@ class WooAPI(object):
                 url=location,  # Your store URL
                 consumer_key=cons_key,  # Your consumer key
                 consumer_secret=sec_key,  # Your consumer secret
-                version=version,  # WooCommerce WP REST API version
+                wp_api=True,
+                version="wc/v2",  # WooCommerce WP REST API version
                 query_string_auth=True  # Force Basic Authentication as query
                                         # string true and using under HTTPS
             )
@@ -88,22 +86,28 @@ class WooAPI(object):
                         arguments.pop()
                 start = datetime.now()
                 try:
+                    print("PDB-----------------------", method, arguments, resource)
+                    # resource = 'shipping/zones'
+                    # import pdb
+                    # pdb.set_trace()
+
                     wooapi = getattr(wcapi, method)
                     res = wooapi(resource) if method not in ['put', 'post'] \
-                    else wooapi(resource, arguments)
+                        else wooapi(resource, arguments)
                     vals = res.json()
                     if not res.ok:
                         raise FailedJobError(vals)
                     result = vals
                 except:
                     _logger.error("api.call(%s, %s, %s) failed", method,
-                                   resource, arguments)
+                                  resource, arguments)
                     raise
                 else:
                     _logger.debug("api.call(%s, %s, %s) returned %s in %s\
                      seconds", method, resource, arguments, result,
-                                (datetime.now() - start).seconds)
+                                  (datetime.now() - start).seconds)
                 return result
+            1 / 0
         except (socket.gaierror, socket.error, socket.timeout) as err:
             raise NetworkRetryableError(
                 'A network error caused the failure of the job: '

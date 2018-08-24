@@ -10,3 +10,5 @@ from . import product_category
 from . import product
 from . import customer
 from . import sale
+from . import shipping_methods
+from . import shipping_zone

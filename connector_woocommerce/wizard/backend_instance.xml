@@ -12,6 +12,10 @@
                         <notebook>
                             <page string="WooCommerce to Odoo">
                                 <group>
+                                    <group name="Delivery Carrier">
+                                        <separator  string="Delivery" />
+                                        <field string="Import Delivery" name="import_shippingzone"/>
+                                    </group>
                                     <group name="Products">
                                         <separator  string="Products" />
                                         <field string="Import Products" name="import_product"/>
@@ -34,6 +38,11 @@
                             </page>
                             <page string="Odoo to WooCommerce">
                                 <group>
+                                     <group name="Shipping">
+                                        <separator string="Shipping" />
+                                        <field string="Export Shipping" name="export_shippingzone"/>
+                                        <field string="Update Shipping" name="update_shippingzone"/>
+                                    </group>
                                     <group name="Products">
                                         <separator string="Products" />
                                         <field string="Export Products" name="export_product"/>

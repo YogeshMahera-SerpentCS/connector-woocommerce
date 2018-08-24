@@ -58,7 +58,6 @@
 					<footer>
 						<button name="woo_export" string="Export" type="object"
 							class="oe_highlight" />
-						or
 						<button string="Cancel" class="oe_link" special="cancel" />
 					</footer>
 				</form>

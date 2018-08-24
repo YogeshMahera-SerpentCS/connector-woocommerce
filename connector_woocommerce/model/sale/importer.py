@@ -60,7 +60,6 @@ class SaleOrderBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
-
         '''To check that if any sale order is deleted from
         WooCommerce then remove reference of that sale order from Odoo'''
         saleOrder_ref = self.env['woo.sale.order']
@@ -71,17 +70,19 @@ class SaleOrderBatchImporter(Component):
         for ext_id in saleOrder_rec:
             record.append(int(ext_id.external_id))
         # Get difference ids
-        diff = list(set(record)-set(record_ids))
+        diff = list(set(record) - set(record_ids))
         for del_woo_rec in diff:
-            woo_saleOrder_id = saleOrder_ref.search([('external_id', '=', del_woo_rec)])
+            woo_saleOrder_id = saleOrder_ref.search(
+                [('external_id', '=', del_woo_rec)])
             saleOrder_id = woo_saleOrder_id.odoo_id
-            odoo_saleOrder_id = self.env['sale.order'].search([('id', '=', saleOrder_id.id)])
+            odoo_saleOrder_id = self.env['sale.order'].search(
+                [('id', '=', saleOrder_id.id)])
             # Delete reference from odoo
             odoo_saleOrder_id.write({
-            'woo_bind_ids': [(3, odoo_saleOrder_id.woo_bind_ids[0].id)],
-            'sync_data': False,
-            'woo_backend_id': None
-        })
+                'woo_bind_ids': [(3, odoo_saleOrder_id.woo_bind_ids[0].id)],
+                'sync_data': False,
+                'woo_backend_id': None
+            })
 
         for record_id in record_ids:
             woo_sale_order = saleOrder_ref.search(
@@ -145,7 +146,6 @@ class SaleOrderImporter(Component):
         return resource
 
     def _create(self, data):
-        print("-----------------------------", data)
         odoo_binding = super(SaleOrderImporter, self)._create(data)
         # Adding Creation Checkpoint
         self.backend_record.add_checkpoint(odoo_binding)
@@ -155,7 +155,7 @@ class SaleOrderImporter(Component):
         """ Update an Odoo record """
         super(SaleOrderImporter, self)._update(binding, data)
         # Adding updation checkpoint
-        #self.backend_record.add_checkpoint(binding)
+        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):
@@ -182,18 +182,7 @@ class SaleOrderImportMapper(Component):
     _inherit = 'woo.import.mapper'
     _apply_on = 'woo.sale.order'
 
-    children = [('items', 'woo_order_line_ids', 'woo.sale.order.line'),
-                ]
-
-    # @mapping
-    # def picking(self, record):
-    #     if record['order']:
-    #         rec = record['order']
-    #         if rec['status']:
-    #             print("-------------------------")
-    #             return {'picking_ids.state': 'AAAAAAAAA'}
-    #         # import pdb
-    #         pdb.set_trace()
+    children = [('items', 'woo_order_line_ids', 'woo.sale.order.line'), ]
 
     @mapping
     def status(self, record):
@@ -216,7 +205,7 @@ class SaleOrderImportMapper(Component):
                             }
                 else:
                     status_id = self.env['woo.sale.order.status'].sudo().\
-                    create({'name': rec['status']})
+                        create({'name': rec['status']})
                     return {'status_id': status_id.id,
                             'state': rec['status'],
                             }
@@ -232,7 +221,7 @@ class SaleOrderImportMapper(Component):
             binder = self.binder_for('woo.res.partner')
             if rec['customer_id']:
                 partner_id = binder.to_internal(rec['customer_id'],
-                                               unwrap=True) or False
+                                                unwrap=True) or False
                 assert partner_id, ("Please Check Customer Role \
                                     in WooCommerce")
                 result = {'partner_id': partner_id.id}
@@ -261,7 +250,7 @@ class SaleOrderImportMapper(Component):
                 }
                 partner_id = self.env['res.partner'].create(partner_dict)
                 # Need to manage address import as independent one.
-                #partner_dict.update({
+                # partner_dict.update({
                 #    'backend_id': self.backend_record.id,
                 #    'odoo_id': partner_id.id,
                 #})

@@ -23,7 +23,6 @@
     'auto_install': False,
     'data': [
         "security/ir.model.access.csv",
-        # "data/import_cron.xml",
         "views/backend_view.xml",
         "views/product_view.xml",
         "views/res_partner_views.xml",

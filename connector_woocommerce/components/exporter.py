@@ -65,7 +65,6 @@ class WooBaseExporter(AbstractComponent):
         return result
 
     def run(self, binding, *args, **kwargs):
-        print("RUN call---------------")
         """ Run the synchronization
 
         :param binding: binding record to export

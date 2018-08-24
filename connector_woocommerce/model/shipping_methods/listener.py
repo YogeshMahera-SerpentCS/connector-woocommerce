@@ -6,10 +6,10 @@ from odoo.addons.component.core import Component
 from odoo.addons.component_event import skip_if
 
 
-class WooCustomerBindingExportListener(Component):
-    _name = 'woo.res.partner.binding.export.listener'
+class WooDeliveryCarrierBindingExportListener(Component):
+    _name = 'woo.delivery.carrier.binding.export.listener'
     _inherit = 'base.connector.listener'
-    _apply_on = ['woo.res.partner']
+    _apply_on = ['woo.delivery.carrier']
 
     @skip_if(lambda self, record, **kwargs: self.no_connector_export(record))
     def on_record_create(self, record, fields=None):
@@ -27,10 +27,10 @@ class WooCustomerBindingExportListener(Component):
                                                          external_id)
 
 
-class WooCustomerExportListener(Component):
-    _name = 'woo.res.partner.export.listener'
+class WooDeliveryCarrierExportListener(Component):
+    _name = 'woo.delivery.carrier.export.listener'
     _inherit = 'base.connector.listener'
-    _apply_on = ['woo.res.partner']
+    _apply_on = ['woo.delivery.carrier']
 
     # XXX must check record.env!!!
     @skip_if(lambda self, record, **kwargs: self.no_connector_export(record))

@@ -23,4 +23,5 @@ class WooModelBinder(Component):
         'woo.product.product',
         'woo.sale.order',
         'woo.sale.order.line',
+        'woo.shipping.zone',
     ]
