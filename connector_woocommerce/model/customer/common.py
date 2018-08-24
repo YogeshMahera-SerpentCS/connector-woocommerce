@@ -24,9 +24,9 @@ class WooResPartner(models.Model):
     _rec_name = 'name'
 
     odoo_id = fields.Many2one(comodel_name='res.partner',
-                                 string='Partner',
-                                 required=True,
-                                 ondelete='cascade')
+                              string='Partner',
+                              required=True,
+                              ondelete='cascade')
     backend_id = fields.Many2one(
         comodel_name='woo.backend',
         string='Woo Backend',
@@ -72,10 +72,10 @@ class CustomerAdapter(Component):
     def _call(self, method, resource, arguments):
         try:
             return super(CustomerAdapter, self)._call(
-                                                method,
-                                                resource,
-                                                arguments
-                                            )
+                method,
+                resource,
+                arguments
+            )
         except xmlrpc.client.Fault as err:
             # this is the error in the WooCommerce API
             # when the customer does not exist
@@ -103,7 +103,7 @@ class CustomerAdapter(Component):
         # the search method is on ol_customer instead of customer
         res = self._call(method, 'customers', [filters] if filters else [{}])
 
-        # Set customer ids and return it(Due to new Wordpress version)
+        # Set customer ids and return it(Due to new WooCommerce REST API)
         customer_ids = list()
         for customer in res.get('customers'):
             customer_ids.append(customer.get('id'))
@@ -145,8 +145,4 @@ class CustomerAdapter(Component):
         @param: filters : Filters to check (json)
         @return: result : Response of Woocom (Boolean)
         """
-        return self._call(
-            'get',
-            self._woo_model + '/' + str(woo_id),
-            filters
-        )
+        return self._call('get', self._woo_model + '/' + str(woo_id), filters)

@@ -71,7 +71,6 @@ class WooExport(models.TransientModel):
         )
         method = "get"
         arguments= {}
-
         path = ''
         resource = ''
         # Set path based on active model
@@ -84,7 +83,6 @@ class WooExport(models.TransientModel):
         # Set resource based on path
         if path != '':
             resource = path + str(is_woo_data.external_id)
-
         if wcapi:
             result = {}
             if isinstance(arguments, list):

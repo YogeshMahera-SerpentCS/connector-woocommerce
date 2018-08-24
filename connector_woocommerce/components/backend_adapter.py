@@ -7,7 +7,6 @@ import socket
 import logging
 import xmlrpc.client
 from datetime import datetime
-
 from odoo import http
 from odoo.http import request
 
@@ -65,9 +64,6 @@ class WooAPI(object):
             return
 
     def call(self, method=None, resource=None, arguments=None):
-        print ("arguments.....", arguments)
-        print ("resource..........", resource)
-        print ("method............", method)
         try:
             location = self._location._location
             cons_key = self._location.consumer_key

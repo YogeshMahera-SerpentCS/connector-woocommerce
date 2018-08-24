@@ -1,4 +1,4 @@
-    # © 2009 Tech-Receptives Solutions Pvt. Ltd.
+# © 2009 Tech-Receptives Solutions Pvt. Ltd.
 # © 2018 Serpent Consulting Services Pvt. Ltd.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # See LICENSE file for full copyright and licensing details.
@@ -40,7 +40,6 @@ class ProductBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
-
         '''To check that if any product is deleted from
         WooCommerce then remove reference of that product from Odoo'''
         product_ref = self.env['woo.product.product']
@@ -50,17 +49,19 @@ class ProductBatchImporter(Component):
         for ext_id in product_rec:
             record.append(int(ext_id.external_id))
         # Get difference ids
-        diff = list(set(record)-set(record_ids))
+        diff = list(set(record) - set(record_ids))
         for del_woo_rec in diff:
-            woo_product_id = product_ref.search([('external_id', '=', del_woo_rec)])
+            woo_product_id = product_ref.search(
+                [('external_id', '=', del_woo_rec)])
             product_id = woo_product_id.odoo_id
-            odoo_product_id = self.env['product.product'].search([('id', '=', product_id.id)])
+            odoo_product_id = self.env['product.product'].search(
+                [('id', '=', product_id.id)])
             # Delete reference from odoo
             odoo_product_id.write({
-            'woo_bind_ids': [(3, odoo_product_id.woo_bind_ids[0].id)],
-            'sync_data': False,
-            'woo_backend_id': None
-        })
+                'woo_bind_ids': [(3, odoo_product_id.woo_bind_ids[0].id)],
+                'sync_data': False,
+                'woo_backend_id': None
+            })
 
         _logger.info('search for woo Products %s returned %s',
                      filters, record_ids)
@@ -82,8 +83,6 @@ class ProductProductImporter(Component):
     #                                 'woo.product.category')
 
     def _create(self, data):
-        # import pdb
-        # pdb.set_trace()
         odoo_binding = super(ProductProductImporter, self)._create(data)
         # Adding Creation Checkpoint
         self.backend_record.add_checkpoint(odoo_binding)
@@ -93,7 +92,7 @@ class ProductProductImporter(Component):
         """ Update an Odoo record """
         super(ProductProductImporter, self)._update(binding, data)
         # Adding updation checkpoint
-        #self.backend_record.add_checkpoint(binding)
+        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):
@@ -268,5 +267,3 @@ class ProductProductImportMapper(Component):
     @mapping
     def woo_backend_id(self, record):
         return {'woo_backend_id': self.backend_record.id}
-
-     

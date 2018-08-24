@@ -31,10 +31,10 @@ class WooBackend(models.Model):
     consumer_key = fields.Char("Consumer key")
     consumer_secret = fields.Char("Consumer Secret")
     version = fields.Selection([
-                                ('v2', 'V2'),
-                                ('v3', 'V3')
-                                ],
-                               string='Version')
+        ('v2', 'V2'),
+        ('v3', 'V3')
+    ],
+        string='Version')
     verify_ssl = fields.Boolean("Verify SSL")
     default_lang_id = fields.Many2one(
         comodel_name='res.lang',
@@ -110,12 +110,12 @@ class WooBackend(models.Model):
                 msg = "(Enter Valid url)"
             val = r.json()
         except:
-            raise Warning(_("Sorry, Could not reach WooCommerce site! %s")\
+            raise Warning(_("Sorry, Could not reach WooCommerce site! %s")
                           % (msg))
         msg = ''
         if 'errors' in r.json():
             msg = val['errors'][0]['message'] + '\n' + \
-            val['errors'][0]['code']
+                val['errors'][0]['code']
             raise Warning(_(msg))
         else:
             raise Warning(_('Test Success'))
@@ -127,10 +127,10 @@ class WooBackend(models.Model):
         backend = self
         from_date = None
         self.env['woo.product.category'].with_delay(priority=1).import_batch(
-                backend,
-                filters={'from_date': from_date,
-                         'to_date': import_start_time},
-            )
+            backend,
+            filters={'from_date': from_date,
+                     'to_date': import_start_time},
+        )
         return True
 
     @api.multi
@@ -139,10 +139,10 @@ class WooBackend(models.Model):
         backend = self
         from_date = None
         self.env['woo.product.product'].with_delay(priority=2).import_batch(
-                backend,
-                filters={'from_date': from_date,
-                         'to_date': import_start_time},
-            )
+            backend,
+            filters={'from_date': from_date,
+                     'to_date': import_start_time},
+        )
         return True
 
     @api.multi
@@ -151,10 +151,10 @@ class WooBackend(models.Model):
         backend = self
         from_date = None
         self.env['woo.res.partner'].with_delay(priority=3).import_batch(
-                backend,
-                filters={'from_date': from_date,
-                         'to_date': import_start_time}
-            )
+            backend,
+            filters={'from_date': from_date,
+                     'to_date': import_start_time}
+        )
         return True
 
     @api.multi
@@ -163,10 +163,10 @@ class WooBackend(models.Model):
         backend = self
         from_date = None
         self.env['woo.sale.order'].with_delay(priority=4).import_batch(
-                backend,
-                filters={'from_date': from_date,
-                         'to_date': import_start_time}
-            )
+            backend,
+            filters={'from_date': from_date,
+                     'to_date': import_start_time}
+        )
         return True
 
     @api.multi
@@ -203,7 +203,6 @@ class WooBackend(models.Model):
         This method create/updates the records with Odoo record
          on WooCoomerce store.
         """
-
         # Set active_field based on model for passing context purpose
         if model == 'sale.order':
             active_field = 'order_ids'
@@ -213,7 +212,7 @@ class WooBackend(models.Model):
             active_field = 'product_ids'
         elif model == 'product.category':
             active_field = 'product_cate_ids'
-        # Set actuve_model as model
+        # Set active_model as model
         active_model = model
 
         self.ensure_one()
@@ -225,14 +224,14 @@ class WooBackend(models.Model):
         # Creating Jobs
         for import_id in import_ids:
             is_woo_data = woo_obj.search([
-                                ('odoo_id', '=', import_id.id)], limit=1)
+                ('odoo_id', '=', import_id.id)], limit=1)
             if is_woo_data:
-                #Do export
-
-                # Call method to check that export record is exist in WooCommerce or not
-                result = self.env['wizard.woo.export'].before_woo_validate(active_field=active_field, active_model=model, is_woo_data=is_woo_data, active_id=import_id)
+                '''Call method to check that export record is exist in
+                WooCommerce or not'''
+                result = self.env['wizard.woo.export'].before_woo_validate(
+                    active_field=active_field, active_model=model, is_woo_data=is_woo_data, active_id=import_id)
                 if result == False:
-                    context={
+                    context = {
                         'is_woo_data': is_woo_data.id,
                         'active_field': active_field,
                         'active_model': model,
@@ -240,9 +239,10 @@ class WooBackend(models.Model):
                         'external_id': is_woo_data.external_id,
                         'backend_id': import_id.woo_backend_id.id,
                     }
-                    '''Call method to delete reference of record that is not exist in
+                    '''Call method to delete reference of record which is not exist in
                     WooCommerce and create new record in WooCommerce'''
-                    self.env['wizard.woo.validation'].with_context(context).woo_validate()
+                    self.env['wizard.woo.validation'].with_context(
+                        context).woo_validate()
                 is_woo_data.with_delay().export_record()
             else:
                 # Build environment to export
@@ -260,7 +260,7 @@ class WooBackend(models.Model):
             This Method create/update the product category records
             on WooCommerce with Odoo data.
         """
-        #Add filters if any here.
+        # Add filters if any here.
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
@@ -276,7 +276,7 @@ class WooBackend(models.Model):
             This Method create/update the product records
             on WooCommerce with Odoo data.
         """
-        #Add filters if any here.
+        # Add filters if any here.
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
@@ -292,7 +292,7 @@ class WooBackend(models.Model):
             This Method create/update the customer records
             on WooCommerce with Odoo data.
         """
-        #Add filters if any here.
+        # Add filters if any here.
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
@@ -308,7 +308,7 @@ class WooBackend(models.Model):
             This Method create/update the customer records
             on WooCommerce with Odoo data.
         """
-        #Add filters if any here.
+        # Add filters if any here.
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)

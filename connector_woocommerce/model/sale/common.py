@@ -53,9 +53,9 @@ class WooSaleOrder(models.Model):
                                 'WooCommerce Order Status')
 
     odoo_id = fields.Many2one(comodel_name='sale.order',
-                                 string='Sale Order',
-                                 required=True,
-                                 ondelete='cascade')
+                              string='Sale Order',
+                              required=True,
+                              ondelete='cascade')
     woo_order_line_ids = fields.One2many(
         comodel_name='woo.sale.order.line',
         inverse_name='woo_order_id',
@@ -86,11 +86,11 @@ class WooSaleOrderLine(models.Model):
     _inherits = {'sale.order.line': 'odoo_id'}
 
     woo_order_id = fields.Many2one(
-       comodel_name='woo.sale.order',
-       string='Woo Sale Order',
-       required=True,
-       ondelete='cascade',
-       index=True
+        comodel_name='woo.sale.order',
+        string='Woo Sale Order',
+        required=True,
+        ondelete='cascade',
+        index=True
     )
     odoo_id = fields.Many2one(
         comodel_name='sale.order.line',
@@ -164,8 +164,7 @@ class SaleOrderAdapter(Component):
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
 
-        res = self._call(method, 'orders/',
-                          [filters] if filters else [{}])
+        res = self._call(method, 'orders/', [filters] if filters else [{}])
         # Set sale order ids and return it(Due to new Wordpress version)
         order_ids = list()
         for order in res.get('orders'):

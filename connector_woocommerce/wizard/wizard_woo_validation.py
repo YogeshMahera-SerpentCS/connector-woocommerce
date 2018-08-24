@@ -5,12 +5,11 @@
 
 '''Wizard to check for deleted record from WooCommerce in reference is still in 
 Odoo the delete that reference and create new one record in WooCommerce'''
-
 from odoo import _, api, fields, models
 
 
 class WooValidation(models.TransientModel):
-    
+
     _name = 'wizard.woo.validation'
 
     @api.multi
@@ -31,7 +30,7 @@ class WooValidation(models.TransientModel):
         if context.get("active_model") == 'product.category':
             import_obj = self.env['woo.product.category']
             record = self.env['product.category'].search([('id', '=', odoo_id)])
-    
+
         if context.get("active_model") == 'product.product':
             import_obj = self.env['woo.product.product']
             record = self.env['product.product'].search([('id', '=', odoo_id)])
@@ -47,5 +46,5 @@ class WooValidation(models.TransientModel):
             'backend_id': backend_id,
             'odoo_id': odoo_id,
         })
-        #Do export
+        # Do export
         import_id.with_delay().export_record()

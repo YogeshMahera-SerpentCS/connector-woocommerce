@@ -112,7 +112,7 @@ class CategoryAdapter(Component):
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
         res = self._call(method, 'products/categories', [filters] if filters else [{}])
-        # Set product category ids and return it(Due to new Wordpress version)
+        # Set product category ids and return it(Due to new WooCommerce REST API)
         cat_ids = list()
         for category in res.get('product_categories'):
             cat_ids.append(category.get('id'))

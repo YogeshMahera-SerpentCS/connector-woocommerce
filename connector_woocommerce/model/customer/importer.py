@@ -37,7 +37,6 @@ class CustomerBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
-
         '''To check that if any customer is deleted from
         WooCommerce then remove reference of that customer from Odoo'''
         customer_ref = self.env['woo.res.partner']
@@ -47,17 +46,19 @@ class CustomerBatchImporter(Component):
         for ext_id in customer_rec:
             record.append(int(ext_id.external_id))
         # Get difference ids
-        diff = list(set(record)-set(record_ids))
+        diff = list(set(record) - set(record_ids))
         for del_woo_rec in diff:
-            woo_customer_id = customer_ref.search([('external_id', '=', del_woo_rec)])
+            woo_customer_id = customer_ref.search(
+                [('external_id', '=', del_woo_rec)])
             cust_id = woo_customer_id.odoo_id
-            odoo_customer_id = self.env['res.partner'].search([('id', '=', cust_id.id)])
+            odoo_customer_id = self.env['res.partner'].search(
+                [('id', '=', cust_id.id)])
             # Delete reference from odoo
             odoo_customer_id.write({
-            'woo_bind_ids': [(3, odoo_customer_id.woo_bind_ids[0].id)],
-            'sync_data': False,
-            'woo_backend_id': None
-        })
+                'woo_bind_ids': [(3, odoo_customer_id.woo_bind_ids[0].id)],
+                'sync_data': False,
+                'woo_backend_id': None
+            })
 
         _logger.info('search for woo partners %s returned %s',
                      filters, record_ids)
@@ -85,7 +86,7 @@ class CustomerImporter(Component):
         """ Update an Odoo record """
         super(CustomerImporter, self)._update(binding, data)
         # Adding updation checkpoint
-        #self.backend_record.add_checkpoint(binding)
+        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):
@@ -104,70 +105,70 @@ class CustomerImportMapper(Component):
 
     @mapping
     def name(self, record):
-            if record['customer']:
-                rec = record['customer']
-                return {'name': rec['first_name'] + " " + rec['last_name']}
+        if record['customer']:
+            rec = record['customer']
+            return {'name': rec['first_name'] + " " + rec['last_name']}
 
     @mapping
     def email(self, record):
         if record['customer']:
-                rec = record['customer']
-                return {'email': rec['email'] or None}
+            rec = record['customer']
+            return {'email': rec['email'] or None}
 
     @mapping
     def city(self, record):
         if record['customer']:
-                rec = record['customer']['billing_address']
-                return {'city': rec['city'] or None}
+            rec = record['customer']['billing_address']
+            return {'city': rec['city'] or None}
 
     @mapping
     def zip(self, record):
         if record['customer']:
-                rec = record['customer']['billing_address']
-                return {'zip': rec['postcode'] or None}
+            rec = record['customer']['billing_address']
+            return {'zip': rec['postcode'] or None}
 
     @mapping
     def address(self, record):
         if record['customer']:
-                rec = record['customer']['billing_address']
-                return {'street': rec['address_1'] or None}
+            rec = record['customer']['billing_address']
+            return {'street': rec['address_1'] or None}
 
     @mapping
     def address_2(self, record):
         if record['customer']:
-                rec = record['customer']['billing_address']
-                return {'street2': rec['address_2'] or None}
+            rec = record['customer']['billing_address']
+            return {'street2': rec['address_2'] or None}
 
     @mapping
     def country(self, record):
-            if record['customer']:
-                rec = record['customer']['billing_address']
-                if rec['country']:
-                    country_id = self.env['res.country'].search(
-                        [('code', '=', rec['country'])])
-                    country_id = country_id.id
-                else:
-                    country_id = False
-                return {'country_id': country_id}
+        if record['customer']:
+            rec = record['customer']['billing_address']
+            if rec['country']:
+                country_id = self.env['res.country'].search(
+                    [('code', '=', rec['country'])])
+                country_id = country_id.id
+            else:
+                country_id = False
+            return {'country_id': country_id}
 
     @mapping
     def state(self, record):
-            if record['customer']:
-                rec = record['customer']['billing_address']
-                if rec['state'] and rec['country']:
-                    state_id = self.env['res.country.state'].search(
-                        [('code', '=', rec['state'])], limit=1)
-                    if not state_id:
-                        country_id = self.env['res.country'].search(
-                            [('code', '=', rec['country'])], limit=1)
-                        state_id = self.env['res.country.state'].create(
-                            {'name': rec['state'],
-                             'code': rec['state'],
-                             'country_id': country_id.id})
-                    state_id = state_id.id or False
-                else:
-                    state_id = False
-                return {'state_id': state_id}
+        if record['customer']:
+            rec = record['customer']['billing_address']
+            if rec['state'] and rec['country']:
+                state_id = self.env['res.country.state'].search(
+                    [('code', '=', rec['state'])], limit=1)
+                if not state_id:
+                    country_id = self.env['res.country'].search(
+                        [('code', '=', rec['country'])], limit=1)
+                    state_id = self.env['res.country.state'].create(
+                        {'name': rec['state'],
+                         'code': rec['state'],
+                         'country_id': country_id.id})
+                state_id = state_id.id or False
+            else:
+                state_id = False
+            return {'state_id': state_id}
 
     @mapping
     def backend_id(self, record):

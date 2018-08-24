@@ -23,9 +23,9 @@ class WooProductProduct(models.Model):
     _rec_name = 'name'
 
     odoo_id = fields.Many2one(comodel_name='product.product',
-                                 string='product',
-                                 required=True,
-                                 ondelete='cascade')
+                              string='product',
+                              required=True,
+                              ondelete='cascade')
     backend_id = fields.Many2one(
         comodel_name='woo.backend',
         string='Woo Backend',
@@ -81,10 +81,10 @@ class ProductProductAdapter(Component):
     def _call(self, method, resource, arguments):
         try:
             return super(ProductProductAdapter, self)._call(
-                                                    method,
-                                                    resource,
-                                                    arguments
-                                                )
+                method,
+                resource,
+                arguments
+            )
         except xmlrpc.client.Fault as err:
             # this is the error in the WooCommerce API
             # when the customer does not exist
@@ -108,9 +108,8 @@ class ProductProductAdapter(Component):
         if to_date is not None:
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
-        res = self._call(method, 'products',
-                          [filters] if filters else [{}])
-        # Set product ids and return it(Due to new Wordpress version)
+        res = self._call(method, 'products', [filters] if filters else [{}])
+        # Set product ids and return it(Due to new WooCommerce REST API)
         product_ids = list()
         for product in res.get('products'):
             product_ids.append(product.get('id'))
@@ -118,10 +117,10 @@ class ProductProductAdapter(Component):
 
     def get_images(self, id, method='get'):
         return self._call(
-                    method,
-                    'products/' + str(id),
-                    []
-                )
+            method,
+            'products/' + str(id),
+            []
+        )
 
     def create(self, data):
         """ Create a record on the external system """
