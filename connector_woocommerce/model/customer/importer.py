@@ -37,6 +37,28 @@ class CustomerBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
+
+        '''To check that if any customer is deleted from
+        WooCommerce then remove reference of that customer from Odoo'''
+        customer_ref = self.env['woo.res.partner']
+        record = []
+        # Get external ids from odoo for comparison
+        customer_rec = customer_ref.search([('external_id', '!=', '')])
+        for ext_id in customer_rec:
+            record.append(int(ext_id.external_id))
+        # Get difference ids
+        diff = list(set(record)-set(record_ids))
+        for del_woo_rec in diff:
+            woo_customer_id = customer_ref.search([('external_id', '=', del_woo_rec)])
+            cust_id = woo_customer_id.odoo_id
+            odoo_customer_id = self.env['res.partner'].search([('id', '=', cust_id.id)])
+            # Delete reference from odoo
+            odoo_customer_id.write({
+            'woo_bind_ids': [(3, odoo_customer_id.woo_bind_ids[0].id)],
+            'sync_data': False,
+            'woo_backend_id': None
+        })
+
         _logger.info('search for woo partners %s returned %s',
                      filters, record_ids)
         # Importing data

@@ -5,7 +5,13 @@
 
 from odoo import _, api, fields, models
 from odoo.exceptions import Warning
-
+import logging
+try:
+    from woocommerce import API
+except ImportError:
+    _logger.debug("Cannot import 'woocommerce'")
+from datetime import datetime
+_logger = logging.getLogger(__name__)
 
 class WooExport(models.TransientModel):
     """
@@ -45,6 +51,72 @@ class WooExport(models.TransientModel):
         string='Sale Orders'
     )
 
+    # Method to check that export record is exist in WooCommerce or not
+    @api.multi
+    def before_woo_validate(self, active_field, active_model, is_woo_data, active_id):
+        wac = self.env['woo.backend'].search([],limit=1)
+        location = wac.location
+        cons_key = wac.consumer_key
+        sec_key = wac.consumer_secret
+        version = wac.version or 'v3'
+
+        # WooCommerce API Connection
+        wcapi = API(
+            url=location,  # Your store URL
+            consumer_key=cons_key,  # Your consumer key
+            consumer_secret=sec_key,  # Your consumer secret
+            version=version,  # WooCommerce WP REST API version
+            query_string_auth=True  # Force Basic Authentication as query
+                                    # string true and using under HTTPS
+        )
+        method = "get"
+        arguments= {}
+
+        path = ''
+        resource = ''
+        # Set path based on active model
+        if active_model == 'res.partner':
+            path = "customers/"
+        if active_model == 'product.category':
+            path = "products/categories/"
+        if active_model == 'product.product':
+            path = "products/"
+        # Set resource based on path
+        if path != '':
+            resource = path + str(is_woo_data.external_id)
+
+        if wcapi:
+            result = {}
+            if isinstance(arguments, list):
+                while arguments and arguments[-1] is None:
+                    arguments.pop()
+            start = datetime.now()
+            try:
+                wooapi = getattr(wcapi, method)
+                res = wooapi(resource) if method not in ['put', 'post'] \
+                else wooapi(resource, arguments)
+                vals = res.json()
+                invalid_record_flag = 0
+                # Check that if record is deleted from WooCommerce or not
+                if 'errors' in vals and vals['errors'][0].get('code') == 'woocommerce_api_invalid_product_category_id':
+                    invalid_record_flag = 1
+                if 'errors' in vals and vals['errors'][0].get('code') == 'woocommerce_api_invalid_product_id':
+                    invalid_record_flag = 1
+                if 'errors' in vals and vals['errors'][0].get('code') == 'woocommerce_api_invalid_customer':
+                    invalid_record_flag = 1
+                # If record is deleted from WooCommerce then return False
+                if invalid_record_flag == 1:
+                    invalid_record_flag = 0
+                    return False
+            except:
+                _logger.error("api.call(%s, %s, %s) failed", method, resource, arguments)
+                raise
+            else:
+                _logger.debug("api.call(%s, %s, %s) returned %s in %s\
+                seconds", method, resource, arguments, result,
+                            (datetime.now() - start).seconds)
+            return True
+
     @api.multi
     def woo_export(self):
         """"
@@ -70,10 +142,23 @@ class WooExport(models.TransientModel):
                         " ID : %s" %
                         (active_id.display_name, active_id.id)
                     ))
-                is_woo_data = import_obj.search([
-                                ('odoo_id', '=', active_id.id)], limit=1)
+                is_woo_data = import_obj.search([('odoo_id', '=', active_id.id)], limit=1)
                 if is_woo_data:
-                    #Do the export
+                    # Call method to check that export record is exist in WooCommerce or not
+                    result = self.before_woo_validate(active_field, active_model, is_woo_data, active_id)
+                    '''if record not found on WooCommerce then alert
+                    user to create forcefully new record on WooCommerce (Using Wizard)'''
+                    if result == False:
+                        return {
+                            'name': _('Invalid Record'),
+                            'type': 'ir.actions.act_window',
+                            'view_type': 'form',
+                            'view_mode': 'form',
+                            'view_id': self.env.ref('connector_woocommerce.woo_validation_form_view').id,
+                            'res_model': 'wizard.woo.validation',
+                            'target': 'new',
+                            'context': {'is_woo_data': is_woo_data.id, 'active_field': active_field, 'active_model': active_model, 'odoo_id': is_woo_data.odoo_id.id, 'external_id': is_woo_data.external_id, 'backend_id': active_id.woo_backend_id.id,},
+                        }
                     is_woo_data.with_delay().export_record()
                 else:
                     # Build environment to export

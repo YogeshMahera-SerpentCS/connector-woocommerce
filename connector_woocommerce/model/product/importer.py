@@ -1,4 +1,4 @@
-# © 2009 Tech-Receptives Solutions Pvt. Ltd.
+    # © 2009 Tech-Receptives Solutions Pvt. Ltd.
 # © 2018 Serpent Consulting Services Pvt. Ltd.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # See LICENSE file for full copyright and licensing details.
@@ -40,6 +40,28 @@ class ProductBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
+
+        '''To check that if any product is deleted from
+        WooCommerce then remove reference of that product from Odoo'''
+        product_ref = self.env['woo.product.product']
+        record = []
+        # Get external ids from odoo for comparison
+        product_rec = product_ref.search([('external_id', '!=', '')])
+        for ext_id in product_rec:
+            record.append(int(ext_id.external_id))
+        # Get difference ids
+        diff = list(set(record)-set(record_ids))
+        for del_woo_rec in diff:
+            woo_product_id = product_ref.search([('external_id', '=', del_woo_rec)])
+            product_id = woo_product_id.odoo_id
+            odoo_product_id = self.env['product.product'].search([('id', '=', product_id.id)])
+            # Delete reference from odoo
+            odoo_product_id.write({
+            'woo_bind_ids': [(3, odoo_product_id.woo_bind_ids[0].id)],
+            'sync_data': False,
+            'woo_backend_id': None
+        })
+
         _logger.info('search for woo Products %s returned %s',
                      filters, record_ids)
         for record_id in record_ids:
@@ -51,15 +73,17 @@ class ProductProductImporter(Component):
     _inherit = 'woo.importer'
     _apply_on = ['woo.product.product']
 
-    def _import_dependencies(self):
-        """ Import the dependencies for the record"""
-        record = self.woo_record
-        record = record['product']
-        for woo_category_id in record['categories']:
-            self._import_dependency(woo_category_id,
-                                    'woo.product.category')
+    # def _import_dependencies(self):
+    #     """ Import the dependencies for the record"""
+    #     record = self.woo_record
+    #     record = record['product']
+    #     for woo_category_id in record['categories']:
+    #         self._import_dependency(woo_category_id,
+    #                                 'woo.product.category')
 
     def _create(self, data):
+        # import pdb
+        # pdb.set_trace()
         odoo_binding = super(ProductProductImporter, self)._create(data)
         # Adding Creation Checkpoint
         self.backend_record.add_checkpoint(odoo_binding)
@@ -176,6 +200,15 @@ class ProductProductImportMapper(Component):
             return {'name': rec['title']}
 
     @mapping
+    def website_published(self, record):
+        if record['product']:
+            rec = record['product']
+            if rec['status'] == 'publish':
+                return {'website_published': True}
+            else:
+                return {'website_published': False}
+
+    @mapping
     def type(self, record):
         if record['product']:
             rec = record['product']
@@ -235,3 +268,5 @@ class ProductProductImportMapper(Component):
     @mapping
     def woo_backend_id(self, record):
         return {'woo_backend_id': self.backend_record.id}
+
+     

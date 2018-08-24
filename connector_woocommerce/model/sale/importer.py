@@ -60,9 +60,31 @@ class SaleOrderBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
+
+        '''To check that if any sale order is deleted from
+        WooCommerce then remove reference of that sale order from Odoo'''
+        saleOrder_ref = self.env['woo.sale.order']
         order_ids = []
+        record = []
+        # Get external ids from odoo for comparison
+        saleOrder_rec = saleOrder_ref.search([('external_id', '!=', '')])
+        for ext_id in saleOrder_rec:
+            record.append(int(ext_id.external_id))
+        # Get difference ids
+        diff = list(set(record)-set(record_ids))
+        for del_woo_rec in diff:
+            woo_saleOrder_id = saleOrder_ref.search([('external_id', '=', del_woo_rec)])
+            saleOrder_id = woo_saleOrder_id.odoo_id
+            odoo_saleOrder_id = self.env['sale.order'].search([('id', '=', saleOrder_id.id)])
+            # Delete reference from odoo
+            odoo_saleOrder_id.write({
+            'woo_bind_ids': [(3, odoo_saleOrder_id.woo_bind_ids[0].id)],
+            'sync_data': False,
+            'woo_backend_id': None
+        })
+
         for record_id in record_ids:
-            woo_sale_order = self.env['woo.sale.order'].search(
+            woo_sale_order = saleOrder_ref.search(
                 [('external_id', '=', record_id)])
             if woo_sale_order:
                 self.update_existing_order(woo_sale_order[0], record_id)
@@ -123,6 +145,7 @@ class SaleOrderImporter(Component):
         return resource
 
     def _create(self, data):
+        print("-----------------------------", data)
         odoo_binding = super(SaleOrderImporter, self)._create(data)
         # Adding Creation Checkpoint
         self.backend_record.add_checkpoint(odoo_binding)
@@ -161,6 +184,16 @@ class SaleOrderImportMapper(Component):
 
     children = [('items', 'woo_order_line_ids', 'woo.sale.order.line'),
                 ]
+
+    # @mapping
+    # def picking(self, record):
+    #     if record['order']:
+    #         rec = record['order']
+    #         if rec['status']:
+    #             print("-------------------------")
+    #             return {'picking_ids.state': 'AAAAAAAAA'}
+    #         # import pdb
+    #         pdb.set_trace()
 
     @mapping
     def status(self, record):

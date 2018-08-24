@@ -101,8 +101,13 @@ class CustomerAdapter(Component):
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
         # the search method is on ol_customer instead of customer
-        return self._call(method, 'customers/list',
-                          [filters] if filters else [{}])
+        res = self._call(method, 'customers', [filters] if filters else [{}])
+
+        # Set customer ids and return it(Due to new Wordpress version)
+        customer_ids = list()
+        for customer in res.get('customers'):
+            customer_ids.append(customer.get('id'))
+        return customer_ids
 
     def read(self, id, attributes=None):
         """ Returns the information of a record
@@ -140,10 +145,8 @@ class CustomerAdapter(Component):
         @param: filters : Filters to check (json)
         @return: result : Response of Woocom (Boolean)
         """
-        self._call(
+        return self._call(
             'get',
             self._woo_model + '/' + str(woo_id),
             filters
         )
-        return True
-

@@ -23,11 +23,14 @@
     'auto_install': False,
     'data': [
         "security/ir.model.access.csv",
+        # "data/import_cron.xml",
         "views/backend_view.xml",
         "views/product_view.xml",
         "views/res_partner_views.xml",
         "views/sale_views.xml",
         "wizard/woo_export_view.xml",
+        "wizard/woo_validation_view.xml",
+        "wizard/backend_instance.xml",
     ],
     'external_dependencies': {
         'python': ['woocommerce'],

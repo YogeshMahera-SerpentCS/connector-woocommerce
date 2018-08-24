@@ -6,7 +6,7 @@ from odoo.addons.component.core import Component
 from odoo.addons.component_event import skip_if
 
 
-class WooCustomerBindingExportListener(Component):
+class WooShippingZoneBindingExportListener(Component):
     _name = 'woo.res.partner.binding.export.listener'
     _inherit = 'base.connector.listener'
     _apply_on = ['woo.res.partner']

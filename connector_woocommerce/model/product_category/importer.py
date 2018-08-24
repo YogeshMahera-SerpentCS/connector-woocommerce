@@ -42,6 +42,27 @@ class CategoryBatchImporter(Component):
             from_date=from_date,
             to_date=to_date,
         )
+        '''To check that if any product category is deleted from
+        WooCommerce then remove reference of that product category from Odoo'''
+        category_ref = self.env['woo.product.category']
+        record = []
+        # Get external ids from odoo for comparison
+        cat_rec = category_ref.search([('external_id', '!=', '')])
+        for ext_id in cat_rec:
+            record.append(int(ext_id.external_id))
+        # Get difference ids
+        diff = list(set(record)-set(record_ids))
+        for del_woo_rec in diff:
+            woo_cat_id = category_ref.search([('external_id', '=', del_woo_rec)])
+            cat_id = woo_cat_id.odoo_id
+            odoo_cat_id = self.env['product.category'].search([('id', '=', cat_id.id)])
+            # Delete reference from odoo
+            odoo_cat_id.write({
+            'woo_bind_ids': [(3, odoo_cat_id.woo_bind_ids[0].id)],
+            'sync_data': False,
+            'woo_backend_id': None
+        })
+
         _logger.info('search for woo Product Category %s returned %s',
                      filters, record_ids)
         for record_id in record_ids:

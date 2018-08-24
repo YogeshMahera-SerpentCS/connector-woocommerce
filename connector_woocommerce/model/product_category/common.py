@@ -111,8 +111,12 @@ class CategoryAdapter(Component):
         if to_date is not None:
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
-        return self._call(method, 'products/categories/list',
-                          [filters] if filters else [{}])
+        res = self._call(method, 'products/categories', [filters] if filters else [{}])
+        # Set product category ids and return it(Due to new Wordpress version)
+        cat_ids = list()
+        for category in res.get('product_categories'):
+            cat_ids.append(category.get('id'))
+        return cat_ids
 
     def create(self, data):
         """ Create a record on the external system """
@@ -135,9 +139,4 @@ class CategoryAdapter(Component):
         @param: filters : Filters to check (json)
         @return: result : Response of Woocom (Boolean)
         """
-        self._call(
-            'get',
-            self._woo_model + '/' + str(woo_id),
-            filters
-        )
-        return True
+        return self._call('get',self._woo_model + '/' + str(woo_id), filters)

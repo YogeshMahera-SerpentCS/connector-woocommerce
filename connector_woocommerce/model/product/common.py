@@ -75,7 +75,7 @@ class ProductProductAdapter(Component):
     _inherit = 'woo.adapter'
     _apply_on = 'woo.product.product'
 
-    _woo_model = 'products/details'
+    _woo_model = 'products'
     _woo_base_model = 'products'
 
     def _call(self, method, resource, arguments):
@@ -108,9 +108,13 @@ class ProductProductAdapter(Component):
         if to_date is not None:
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
-
-        return self._call(method, 'products/list',
+        res = self._call(method, 'products',
                           [filters] if filters else [{}])
+        # Set product ids and return it(Due to new Wordpress version)
+        product_ids = list()
+        for product in res.get('products'):
+            product_ids.append(product.get('id'))
+        return product_ids
 
     def get_images(self, id, method='get'):
         return self._call(

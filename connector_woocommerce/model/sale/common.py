@@ -164,8 +164,13 @@ class SaleOrderAdapter(Component):
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
 
-        return self._call(method, 'orders/list',
+        res = self._call(method, 'orders/',
                           [filters] if filters else [{}])
+        # Set sale order ids and return it(Due to new Wordpress version)
+        order_ids = list()
+        for order in res.get('orders'):
+            order_ids.append(order.get('id'))
+        return order_ids
 
     def read(self, id, attributes=None):
         """ Returns the information of a record
