@@ -70,16 +70,6 @@ class ShippingZoneImporter(Component):
     _inherit = 'woo.importer'
     _apply_on = ['woo.shipping.zone']
 
-    # def _import_dependencies(self):
-    #     """ Import the dependencies for the record"""
-    #     record = self.woo_record
-    #     # import parent category
-    #     # the root category has a 0 parent_id
-    #     record = record['args']
-    #     if record['parent']:
-    #         self._import_dependency(record.get('parent'), self.model)
-    #     return
-
     def _create(self, data):
         odoo_binding = super(ShippingZoneImporter, self)._create(data)
         # Adding Creation Checkpoint

@@ -134,7 +134,6 @@ class SaleOrderExportMapper(Component):
                 items.append({
                     "product_id": product_id,
                     # SKU can be used instead of product_id, while mapping.
-                    # "sku": line.product_id.default_code,
                     "quantity": line.product_uom_qty,
                     "total": line.price_unit
                 })

@@ -83,8 +83,6 @@ class DeliveryCarrierImporter(Component):
     def _update(self, binding, data):
         """ Update an Odoo record """
         super(DeliveryCarrierImporter, self)._update(binding, data)
-        # Adding updation checkpoint
-        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):
@@ -106,78 +104,3 @@ class DeliveryCarrierImportMapper(Component):
         if record['deliverycarier']:
             rec = record['deliverycarier']
             return {'name': rec['method_title']}
-
-    # @mapping
-    # def email(self, record):
-    #     if record['deliverycarier']:
-    #         rec = record['deliverycarier']
-    #         return {'email': rec['email'] or None}
-
-    # @mapping
-    # def city(self, record):
-    #     if record['customer']:
-    #         rec = record['customer']['billing_address']
-    #         return {'city': rec['city'] or None}
-
-    # @mapping
-    # def zip(self, record):
-    #     if record['customer']:
-    #         rec = record['customer']['billing_address']
-    #         return {'zip': rec['postcode'] or None}
-
-    # @mapping
-    # def address(self, record):
-    #     if record['customer']:
-    #         rec = record['customer']['billing_address']
-    #         return {'street': rec['address_1'] or None}
-
-    # @mapping
-    # def address_2(self, record):
-    #     if record['customer']:
-    #         rec = record['customer']['billing_address']
-    #         return {'street2': rec['address_2'] or None}
-
-    # @mapping
-    # def country(self, record):
-    #     if record['customer']:
-    #         rec = record['customer']['billing_address']
-    #         if rec['country']:
-    #             country_id = self.env['res.country'].search(
-    #                 [('code', '=', rec['country'])])
-    #             country_id = country_id.id
-    #         else:
-    #             country_id = False
-    #         return {'country_id': country_id}
-
-    # @mapping
-    # def state(self, record):
-    #     if record['customer']:
-    #         rec = record['customer']['billing_address']
-    #         if rec['state'] and rec['country']:
-    #             state_id = self.env['res.country.state'].search(
-    #                 [('code', '=', rec['state'])], limit=1)
-    #             if not state_id:
-    #                 country_id = self.env['res.country'].search(
-    #                     [('code', '=', rec['country'])], limit=1)
-    #                 state_id = self.env['res.country.state'].create(
-    #                     {'name': rec['state'],
-    #                      'code': rec['state'],
-    #                      'country_id': country_id.id})
-    #             state_id = state_id.id or False
-    #         else:
-    #             state_id = False
-    #         return {'state_id': state_id}
-
-    # @mapping
-    # def backend_id(self, record):
-    #     return {'backend_id': self.backend_record.id}
-
-    # # Required for export
-    # @mapping
-    # def sync_data(self, record):
-    #     if record.get('customer'):
-    #         return {'sync_data': True}
-
-    # @mapping
-    # def woo_backend_id(self, record):
-    #     return {'woo_backend_id': self.backend_record.id}

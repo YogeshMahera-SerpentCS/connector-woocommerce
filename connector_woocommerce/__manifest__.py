@@ -14,7 +14,7 @@
     'contributors': """Tech Receptives,
                        Serpent Consulting Services Pvt. Ltd.""",
     'maintainer': 'Odoo Community Association (OCA)',
-    'website': 'http://www.openerp.com',
+    'website': 'https://github.com/OCA/connector-woocommerce',
     'summary': """Imports the Product's Categories, Products, Customers and
                 Sale orders from WooCommerce, Meanwhile Exports from Odoo
                 To WooCommerce.""",

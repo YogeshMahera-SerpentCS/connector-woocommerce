@@ -19,7 +19,6 @@ try:
 except ImportError:
     _logger.debug("Cannot import 'woocommerce'")
 
-
 WOO_DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 

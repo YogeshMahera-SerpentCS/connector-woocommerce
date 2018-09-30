@@ -34,17 +34,6 @@ class ShippingZoneExporter(Component):
         result = {}
         return result
 
-    # def _export_dependencies(self):
-    #     """ Export the dependencies for the record"""
-    #     record = self.binding.odoo_id
-    #     if record.parent_id:
-    #         self._export_dependency(
-    #                     self.binding.odoo_id.parent_id,
-    #                     'woo.product.category',
-    #                     component_usage='product.category.exporter'
-    #                     )
-    #     return
-
 
 class ShippingZoneExportMapper(Component):
     _name = 'woo.shipping.zone.export.mapper'
@@ -55,13 +44,3 @@ class ShippingZoneExportMapper(Component):
     @mapping
     def name(self, record):
         return {"name": record.name}
-
-    # @changed_by('parent_id')
-    # @mapping
-    # def parent(self, record):
-    #     binder = self.binder_for("woo.product.category")
-    #     category_id = False
-    #     if record.parent_id:
-    #         # Get id of product.category model
-    #         category_id = binder.to_external(record.parent_id, wrap=True)
-    #     return {'parent': category_id}

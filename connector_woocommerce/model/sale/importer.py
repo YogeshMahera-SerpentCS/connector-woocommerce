@@ -154,8 +154,6 @@ class SaleOrderImporter(Component):
     def _update(self, binding, data):
         """ Update an Odoo record """
         super(SaleOrderImporter, self)._update(binding, data)
-        # Adding updation checkpoint
-        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):
@@ -249,11 +247,6 @@ class SaleOrderImportMapper(Component):
                     'country_id': country_id
                 }
                 partner_id = self.env['res.partner'].create(partner_dict)
-                # Need to manage address import as independent one.
-                # partner_dict.update({
-                #    'backend_id': self.backend_record.id,
-                #    'odoo_id': partner_id.id,
-                # })
                 result = {'partner_id': partner_id.id}
             return result
 

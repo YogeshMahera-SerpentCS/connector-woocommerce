@@ -27,16 +27,6 @@ class DeliveryCarrierExporter(Component):
 
         Raise `InvalidDataError`
         """
-        # if not data.get('email'):
-        #     raise InvalidDataError(
-        #             "The partner does not have an email "
-        #             "but it is mandatory for Woo"
-        #         )
-        # if not data.get("shipping_address"):
-        #     address = data.get("billing_address")
-        #     address.pop('email')
-        #     address.pop('phone')
-        #     data.update(shipping_address=address)
         return
 
     def _get_data(self, binding, fields):
@@ -56,64 +46,3 @@ class DeliveryCarrierExporterMapper(Component):
             "name": record.method_title,
         }
         return data
-
-    # @changed_by('email')
-    # @mapping
-    # def email(self, record):
-    #     data = {
-    #         "email": record.email,
-    #     }
-    #     return data
-
-    # @only_create
-    # @changed_by('email')
-    # @mapping
-    # def username(self, record):
-    #     data = dict()
-    #     if not record.external_id:
-    #         data.update(username=record.email, password=record.email)
-    #     return data
-
-    # @mapping
-    # def billing(self, record):
-    #     data = {}
-    #     name = record.name.split(" ")
-    #     data.update({
-    #         "first_name": name[0],
-    #         "last_name": " ".join(name[1:]),
-    #         "company": record.company_name,
-    #         "address_1": record.street,
-    #         "address_2": record.street2,
-    #         "city": record.city,
-    #         "postcode": record.zip,
-    #         "email": record.email,
-    #         "phone": record.phone,
-    #         "state": record.state_id and record.state_id.code or False,
-    #         "country": record.country_id and record.country_id.code or False
-    #     })
-    #     return {'billing_address': data}
-
-    # @mapping
-    # def shipping(self, record):
-    #     data = {}
-    #     partner_obj = self.env["res.partner"]
-    #     ship_id = partner_obj.search([
-    #                             ('parent_id', '=', record.odoo_id.id),
-    #                             ('type', '=', 'delivery')],
-    #                                  limit=1,
-    #                                  order='write_date desc')
-    #     if ship_id:
-    #         name = ship_id.name.split(" ")
-    #         data.update({
-    #             "first_name": name[0],
-    #             "last_name": " ".join(name[1:]),
-    #             "company": ship_id.company_name,
-    #             "address_1": ship_id.street,
-    #             "address_2": ship_id.street2,
-    #             "city": ship_id.city,
-    #             "postcode": ship_id.zip,
-    #             "state": ship_id.state_id and ship_id.state_id.code or False,
-    #             "country": ship_id.country_id and ship_id.country_id.code\
-    #              or False
-    #         })
-    #         return {'shipping_address': data}

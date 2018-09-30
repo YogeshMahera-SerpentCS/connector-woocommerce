@@ -11,7 +11,6 @@ from odoo.addons.connector.exception import (IDMissingInBackend,
 
 _logger = logging.getLogger(__name__)
 
-
 """
 
 Exporters for Woo.

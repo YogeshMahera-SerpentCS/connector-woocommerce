@@ -73,14 +73,6 @@ class ProductProductImporter(Component):
     _inherit = 'woo.importer'
     _apply_on = ['woo.product.product']
 
-    # def _import_dependencies(self):
-    #     """ Import the dependencies for the record"""
-    #     record = self.woo_record
-    #     record = record['product']
-    #     for woo_category_id in record['categories']:
-    #         self._import_dependency(woo_category_id,
-    #                                 'woo.product.category')
-
     def _create(self, data):
         odoo_binding = super(ProductProductImporter, self)._create(data)
         # Adding Creation Checkpoint
@@ -91,7 +83,6 @@ class ProductProductImporter(Component):
         """ Update an Odoo record """
         super(ProductProductImporter, self)._update(binding, data)
         # Adding updation checkpoint
-        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):
