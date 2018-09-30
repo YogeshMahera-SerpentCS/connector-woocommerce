@@ -6,7 +6,7 @@
 {
     'name': 'WooCommerce Connector',
     'version': '11.0.1.0.1',
-    'category': 'customized',
+    'category': 'Ecommerce',
     'description': """WooCommerce Connector.""",
     'author': """Tech Receptives,
                 Serpent Consulting Services Pvt. Ltd.,
