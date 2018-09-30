@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 # Copyright 2013-2017 Camptocamp SA
+# © 2018 Serpent Consulting Services Pvt. Ltd.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-import odoo
 
-from odoo.addons.connector.components.mapper import mapping, changed_by
-from odoo.addons.connector.exception import InvalidDataError
 from odoo.addons.component.core import Component
+from odoo.addons.connector.components.mapper import mapping, changed_by
 
 
 class ProductCategoryExporter(Component):
@@ -17,9 +16,9 @@ class ProductCategoryExporter(Component):
     def _after_export(self):
         """After Export"""
         self.binding.odoo_id.sudo().write({
-                        'sync_data': True,
-                        'woo_backend_id': self.backend_record.id
-                    })
+            'sync_data': True,
+            'woo_backend_id': self.backend_record.id
+        })
         return
 
     def _validate_create_data(self, data):
@@ -41,10 +40,10 @@ class ProductCategoryExporter(Component):
         record = self.binding.odoo_id
         if record.parent_id:
             self._export_dependency(
-                        self.binding.odoo_id.parent_id,
-                        'woo.product.category',
-                        component_usage='product.category.exporter'
-                        )
+                self.binding.odoo_id.parent_id,
+                'woo.product.category',
+                component_usage='product.category.exporter'
+            )
         return
 
 

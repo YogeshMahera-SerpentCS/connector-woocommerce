@@ -3,13 +3,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # See LICENSE file for full copyright and licensing details.
 
-'''Wizard to check for deleted record from WooCommerce in reference is still in 
-Odoo the delete that reference and create new one record in WooCommerce'''
-from odoo import _, api, fields, models
+'''Wizard to check for deleted record from WooCommerce in
+reference is still in Odoo the delete that reference and create new one
+record in WooCommerce'''
+from odoo import api, models
 
 
 class WooValidation(models.TransientModel):
-
     _name = 'wizard.woo.validation'
 
     @api.multi
@@ -29,7 +29,8 @@ class WooValidation(models.TransientModel):
 
         if context.get("active_model") == 'product.category':
             import_obj = self.env['woo.product.category']
-            record = self.env['product.category'].search([('id', '=', odoo_id)])
+            record = self.env['product.category'].search(
+                [('id', '=', odoo_id)])
 
         if context.get("active_model") == 'product.product':
             import_obj = self.env['woo.product.product']

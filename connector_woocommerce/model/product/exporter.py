@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright 2013-2017 Camptocamp SA
+# © 2018 Serpent Consulting Services Pvt. Ltd.
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-import odoo
 
-from odoo import http
-from odoo.http import request
-
-from odoo.addons.website.models.website import Website
+from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import mapping, changed_by
 from odoo.addons.connector.exception import InvalidDataError
-from odoo.addons.component.core import Component
 
 
 class ProductProductExporter(Component):
@@ -21,9 +17,9 @@ class ProductProductExporter(Component):
     def _after_export(self):
         """After Export"""
         self.binding.odoo_id.sudo().write({
-                        'sync_data': True,
-                        'woo_backend_id': self.backend_record.id
-                    })
+            'sync_data': True,
+            'woo_backend_id': self.backend_record.id
+        })
         return
 
     def _validate_create_data(self, data):
@@ -34,9 +30,10 @@ class ProductProductExporter(Component):
 
         Raise `InvalidDataError`
         """
-#        if not data.get('email'):
-#            raise InvalidDataError("The partner does not have an email "
-#                                   "but it is mandatory for Woo")
+
+        if not data.get('email'):
+            raise InvalidDataError("The partner does not have an email "
+                                   "but it is mandatory for Woo")
         return
 
     def _get_data(self, binding, fields):
@@ -48,10 +45,10 @@ class ProductProductExporter(Component):
         record = self.binding.odoo_id
         if record.categ_id:
             self._export_dependency(
-                        record.categ_id,
-                        'woo.product.category',
-                        component_usage='product.category.exporter'
-                        )
+                record.categ_id,
+                'woo.product.category',
+                component_usage='product.category.exporter'
+            )
         return
 
 
@@ -87,22 +84,3 @@ class ProductProductExportMapper(Component):
     @mapping
     def sale_price(self, record):
         return {'regular_price': record.list_price}
-
-#Need to fix "woocommerce_api_invalid_remote_product_image" error.
-#    @mapping
-#    def image(self, record):
-#        # Odoo base url
-#        base_url = request.httprequest.url_root
-#        # Custom
-#        image_url = "%sweb/image?model=%s&id=%s&field=%s" %\
-#         (base_url, record._name, record.id, 'image')
-#        ##Using Attachment
-#        ##image_url = base_url + "web/image/%s?access_token=%s" % \
-#        ## (attachment_id, access_token)
-#        return {'images': [
-#                        {
-#                         "src": image_url,
-#                         "position": 0
-#                        }
-#                    ]
-#                }

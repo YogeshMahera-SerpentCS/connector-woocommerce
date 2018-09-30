@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright 2013-2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-import odoo
 
-from odoo.addons.connector.components.mapper import mapping, changed_by
-from odoo.addons.connector.exception import InvalidDataError
 from odoo.addons.component.core import Component
+from odoo.addons.connector.components.mapper import mapping, changed_by
 
 
 class ShippingZoneExporter(Component):

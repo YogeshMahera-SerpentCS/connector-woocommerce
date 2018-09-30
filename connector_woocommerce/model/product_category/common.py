@@ -4,13 +4,12 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
+
 import xmlrpc.client
-
 from odoo import api, fields, models
-
-from odoo.addons.queue_job.job import job, related_action
-from odoo.addons.connector.exception import IDMissingInBackend
 from odoo.addons.component.core import Component
+from odoo.addons.connector.exception import IDMissingInBackend
+from odoo.addons.queue_job.job import job, related_action
 
 _logger = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ class WooProductCategory(models.Model):
     woo_parent_id = fields.Many2one(
         comodel_name='woo.product.category',
         string='Woo Parent Category',
-        ondelete='cascade',)
+        ondelete='cascade', )
     description = fields.Char('Description')
     count = fields.Integer('count')
     woo_child_ids = fields.One2many(
@@ -69,7 +68,7 @@ class ProductCategory(models.Model):
         string="Woo Bindings",
     )
     woo_image = fields.Binary("WooCommerce Image")
-    #These fields are required for export
+    # These fields are required for export
     sync_data = fields.Boolean("Synch with Woo?")
     woo_backend_id = fields.Many2one(
         'woo.backend',
@@ -86,7 +85,8 @@ class CategoryAdapter(Component):
 
     def _call(self, method, resource, arguments):
         try:
-            return super(CategoryAdapter, self)._call(method, resource, arguments)
+            return super(CategoryAdapter, self)._call(method, resource,
+                                                      arguments)
         except xmlrpc.client.Fault as err:
             # this is the error in the WooCommerce API
             # when the product Category does not exist
@@ -111,8 +111,10 @@ class CategoryAdapter(Component):
         if to_date is not None:
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
-        res = self._call(method, 'products/categories', [filters] if filters else [{}])
-        # Set product category ids and return it(Due to new WooCommerce REST API)
+        res = self._call(method, 'products/categories',
+                         [filters] if filters else [{}])
+        # Set product category ids and return
+        # it(Due to new WooCommerce REST API)
         cat_ids = list()
         for category in res.get('product_categories'):
             cat_ids.append(category.get('id'))
@@ -130,7 +132,7 @@ class CategoryAdapter(Component):
         data = {
             "product_category": data
         }
-        return self._call('put', self._woo_model + "/" + str(id),  data)
+        return self._call('put', self._woo_model + "/" + str(id), data)
 
     def is_woo_record(self, woo_id, filters={}):
         """
@@ -139,4 +141,4 @@ class CategoryAdapter(Component):
         @param: filters : Filters to check (json)
         @return: result : Response of Woocom (Boolean)
         """
-        return self._call('get',self._woo_model + '/' + str(woo_id), filters)
+        return self._call('get', self._woo_model + '/' + str(woo_id), filters)

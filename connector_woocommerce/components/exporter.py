@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
-from contextlib import contextmanager
-from datetime import datetime
-
 import psycopg2
-
+from contextlib import contextmanager
 import odoo
 from odoo import _
 from odoo.addons.component.core import AbstractComponent

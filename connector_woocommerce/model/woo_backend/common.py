@@ -4,13 +4,13 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
-
-from datetime import datetime
 from contextlib import contextmanager
+from datetime import datetime
 
 from odoo import models, api, fields, _
-from odoo.exceptions import Warning
 from odoo.addons.connector.models import checkpoint
+from odoo.exceptions import Warning
+
 from ...components.backend_adapter import WooLocation, WooAPI
 
 _logger = logging.getLogger(__name__)
@@ -103,19 +103,19 @@ class WooBackend(models.Model):
                 consumer_secret=sec_key,  # Your consumer secret
                 version=version,  # WooCommerce WP REST API version
                 query_string_auth=True  # Force Basic Authentication as query
-                                        # string true and using under HTTPS
+                # string true and using under HTTPS
             )
             r = wcapi.get("products")
             if r.status_code == 404:
                 msg = "(Enter Valid url)"
             val = r.json()
-        except:
-            raise Warning(_("Sorry, Could not reach WooCommerce site! %s")
-                          % (msg))
+        except Exception as e:
+            raise Warning(_(
+                "Sorry, Could not reach WooCommerce site! %s %s") % (msg, e))
         msg = ''
         if 'errors' in r.json():
             msg = val['errors'][0]['message'] + '\n' + \
-                val['errors'][0]['code']
+                  val['errors'][0]['code']
             raise Warning(_(msg))
         else:
             raise Warning(_('Test Success'))
@@ -123,7 +123,6 @@ class WooBackend(models.Model):
 
     @api.multi
     def import_shippingzone(self):
-        print("shipping import call.....................")
         import_start_time = datetime.now()
         backend = self
         from_date = None
@@ -217,9 +216,6 @@ class WooBackend(models.Model):
          on WooCoomerce store.
         """
         # Set active_field based on model for passing context purpose
-        print("DATA CALL----------------------")
-        
-
         if model == 'res.country':
             active_field = 'res_country'
         elif model == 'sale.order':
@@ -230,8 +226,6 @@ class WooBackend(models.Model):
             active_field = 'product_ids'
         elif model == 'product.category':
             active_field = 'product_cate_ids'
-        # Set active_model as model
-        active_model = model
 
         self.ensure_one()
         if model == 'res.country':
@@ -244,11 +238,6 @@ class WooBackend(models.Model):
         if not import_ids:
             raise Warning(_("Sorry, There is no record to Export!"))
         # Creating Jobs
-
-        print(".....................", model, active_field, woo_obj, target_obj, import_ids)
-        1/2
-        import pdb
-        pdb.set_trace()
         for import_id in import_ids:
             is_woo_data = woo_obj.search([
                 ('odoo_id', '=', import_id.id)], limit=1)
@@ -256,8 +245,9 @@ class WooBackend(models.Model):
                 '''Call method to check that export record is exist in
                 WooCommerce or not'''
                 result = self.env['wizard.woo.export'].before_woo_validate(
-                    active_field=active_field, active_model=model, is_woo_data=is_woo_data, active_id=import_id)
-                if result == False:
+                    active_field=active_field, active_model=model,
+                    is_woo_data=is_woo_data, active_id=import_id)
+                if not result:
                     context = {
                         'is_woo_data': is_woo_data.id,
                         'active_field': active_field,
@@ -291,9 +281,11 @@ class WooBackend(models.Model):
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
-        if context.get('export_product_category') == True and context.get('update_product_category') == False:
+        if context.get('export_product_category') and not context.get(
+                'update_product_category'):
             domain = [('sync_data', '!=', True)]
-        elif context.get('export_product_category') == False and context.get('update_product_category') == True:
+        elif not context.get('export_product_category') and context.get(
+                'update_product_category'):
             domain = [('sync_data', '=', True)]
         self.with_context(context).export_data("product.category", domain)
 
@@ -307,9 +299,11 @@ class WooBackend(models.Model):
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
-        if context.get('export_product') == True and context.get('update_product') == False:
+        if context.get('export_product') and not context.get(
+                'update_product'):
             domain = [('sync_data', '!=', True), ('active', '=', True)]
-        elif context.get('export_product') == False and context.get('update_product') == True:
+        elif not context.get('export_product') and context.get(
+                'update_product'):
             domain = [('sync_data', '=', True), ('active', '=', True)]
         self.with_context(context).export_data("product.product", domain)
 
@@ -323,10 +317,14 @@ class WooBackend(models.Model):
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
-        if context.get('export_customer') == True and context.get('update_customer') == False:
-            domain = [('sync_data', '!=', True), ('customer', '=', True), ('active', '=', True)]
-        elif context.get('export_customer') == False and context.get('update_customer') == True:
-            domain = [('sync_data', '=', True), ('customer', '=', True), ('active', '=', True)]
+        if context.get('export_customer') and not context.get(
+                'update_customer'):
+            domain = [('sync_data', '!=', True), ('customer', '=', True),
+                      ('active', '=', True)]
+        elif not context.get('export_customer')and context.get(
+                'update_customer'):
+            domain = [('sync_data', '=', True), ('customer', '=', True),
+                      ('active', '=', True)]
         self.with_context(context).export_data("res.partner", domain)
 
     @api.multi
@@ -339,9 +337,11 @@ class WooBackend(models.Model):
         domain = []
         context = self.env.context
         # Set domain based on context (Export/Update record condition)
-        if context.get('export_sale_order') == True and context.get('update_sale_order') == False:
+        if context.get('export_sale_order') and not context.get(
+                'update_sale_order'):
             domain = [('sync_data', '!=', True)]
-        elif context.get('export_sale_order') == False and context.get('update_sale_order') == True:
+        elif not context.get('export_sale_order') and context.get(
+                'update_sale_order'):
             domain = [('sync_data', '=', True)]
         self.with_context(context).export_data("sale.order", domain)
 
@@ -354,10 +354,11 @@ class WooBackend(models.Model):
         # Add filters if any here.
         domain = []
         context = self.env.context
-        print("export call---------------------")
         # Set domain based on context (Export/Update record condition)
-        if context.get('export_shippingzone') == True and context.get('update_shippingzone') == False:
+        if context.get('export_shippingzone') and not context.get(
+                'update_shippingzone'):
             domain = [('sync_data', '!=', True)]
-        elif context.get('export_shippingzone') == False and context.get('update_shippingzone') == True:
+        elif not context.get('export_shippingzone') and context.get(
+                'update_shippingzone'):
             domain = [('sync_data', '=', True)]
         self.with_context(context).export_data("res.country", domain)

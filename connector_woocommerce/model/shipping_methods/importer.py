@@ -4,15 +4,14 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
+
 from odoo.addons.component.core import Component
-from odoo.addons.connector.exception import IDMissingInBackend
 from odoo.addons.connector.components.mapper import mapping
 
 _logger = logging.getLogger(__name__)
 
 
 class DeliveryCarrierBatchImporter(Component):
-
     """ Import the WooCommerce Delivery Carrier.
 
     For every Delivery Carrier in the list, a delayed job is created.
@@ -28,30 +27,33 @@ class DeliveryCarrierBatchImporter(Component):
 
     def run(self, filters=None):
         """ Run the synchronization """
-        print("Shipping RUN-------------------")
         from_date = filters.pop('from_date', None)
         to_date = filters.pop('to_date', None)
         # Get external ids with specific filters
-        record_ids = self.backend_adapter.search(method='get', filters=filters, from_date=from_date, to_date=to_date,)
+        record_ids = self.backend_adapter.search(method='get', filters=filters,
+                                                 from_date=from_date,
+                                                 to_date=to_date, )
         '''To check that if any Delivery Carrier is deleted from
         WooCommerce then remove reference of that Delivery Carrier from Odoo'''
-        DeliveryCarrier_ref = self.env['woo.delivery.carrier']
+        deliveryCarrier_ref = self.env['woo.delivery.carrier']
         record = []
         # Get external ids from odoo for comparison
-        DeliveryCarrier_rec = DeliveryCarrier_ref.search([('external_id', '!=', '')])
-        for ext_id in customer_rec:
+        deliveryCarrier_rec = deliveryCarrier_ref.search(
+            [('external_id', '!=', '')])
+        for ext_id in deliveryCarrier_rec:
             record.append(int(ext_id.external_id))
         # Get difference ids
         diff = list(set(record) - set(record_ids))
         for del_woo_rec in diff:
-            woo_DeliveryCarrier_id = DeliveryCarrier_ref.search(
+            woo_DeliveryCarrier_id = deliveryCarrier_ref.search(
                 [('external_id', '=', del_woo_rec)])
             cust_id = woo_DeliveryCarrier_id.odoo_id
             odoo_DeliveryCarrier_id = self.env['delivery.carrier'].search(
                 [('id', '=', cust_id.id)])
             # Delete reference from odoo
             odoo_DeliveryCarrier_id.write({
-                'woo_bind_ids': [(3, odoo_DeliveryCarrier_id.woo_bind_ids[0].id)],
+                'woo_bind_ids': [
+                    (3, odoo_DeliveryCarrier_id.woo_bind_ids[0].id)],
                 'sync_data': False,
                 'woo_backend_id': None
             })

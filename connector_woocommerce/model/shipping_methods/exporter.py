@@ -1,15 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright 2013-2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-import odoo
 
-from odoo import http
-from odoo.http import request
-
-from odoo.addons.website.models.website import Website
-from odoo.addons.connector.components.mapper import changed_by, mapping, only_create
-from odoo.addons.connector.exception import InvalidDataError
 from odoo.addons.component.core import Component
+from odoo.addons.connector.components.mapper import changed_by, mapping
 
 
 class DeliveryCarrierExporter(Component):
@@ -21,9 +15,9 @@ class DeliveryCarrierExporter(Component):
     def _after_export(self):
         "After Import"
         self.binding.odoo_id.sudo().write({
-                        'sync_data': True,
-                        'woo_backend_id': self.backend_record.id
-                    })
+            'sync_data': True,
+            'woo_backend_id': self.backend_record.id
+        })
 
     def _validate_create_data(self, data):
         """ Check if the values to import are correct

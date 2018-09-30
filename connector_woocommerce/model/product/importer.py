@@ -3,11 +3,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # See LICENSE file for full copyright and licensing details.
 
-import logging
-import urllib.request
-import urllib.error
 import base64
+import logging
 
+import urllib.error
+import urllib.request
 from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import mapping
 from odoo.addons.connector.exception import MappingError
@@ -16,7 +16,6 @@ _logger = logging.getLogger(__name__)
 
 
 class ProductBatchImporter(Component):
-
     """ Import the WooCommerce Partners.
 
     For every partner in the list, a delayed job is created.
@@ -107,7 +106,6 @@ class ProductProductImporter(Component):
 
 
 class ProductImageImporter(Component):
-
     """ Import images for a record.
 
     Usually called from importers, in ``_after_import``.

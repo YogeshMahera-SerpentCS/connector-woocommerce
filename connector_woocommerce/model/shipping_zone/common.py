@@ -4,13 +4,12 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
+
 import xmlrpc.client
-
 from odoo import api, fields, models
-
-from odoo.addons.queue_job.job import job, related_action
-from odoo.addons.connector.exception import IDMissingInBackend
 from odoo.addons.component.core import Component
+from odoo.addons.connector.exception import IDMissingInBackend
+from odoo.addons.queue_job.job import job, related_action
 
 _logger = logging.getLogger(__name__)
 
@@ -35,7 +34,6 @@ class WooShippingZone(models.Model):
         store=True,
         readonly=False,
     )
-    
 
     @job(default_channel='root.woo')
     @related_action(action='related_action_unwrap_binding')
@@ -57,7 +55,7 @@ class ShippingZone(models.Model):
         inverse_name='odoo_id',
         string="Woo Bindings",
     )
-    #These fields are required for export
+    # These fields are required for export
     sync_data = fields.Boolean("Synch with Woo?")
     woo_backend_id = fields.Many2one(
         'woo.backend',
@@ -74,7 +72,8 @@ class ShippingZoneAdapter(Component):
 
     def _call(self, method, resource, arguments):
         try:
-            return super(ShippingZoneAdapter, self)._call(method, resource, arguments)
+            return super(ShippingZoneAdapter, self)._call(method, resource,
+                                                          arguments)
         except xmlrpc.client.Fault as err:
             # this is the error in the WooCommerce API
             # when the Shipping Zone does not exist
@@ -99,11 +98,11 @@ class ShippingZoneAdapter(Component):
         if to_date is not None:
             filters.setdefault('updated_at', {})
             filters['updated_at']['to'] = to_date.strftime(dt_fmt)
-        res = self._call(method, 'shipping/zones', [filters] if filters else [{}])
-        print("RES--------------------", res)
+        res = self._call(method, 'shipping/zones',
+                         [filters] if filters else [{}])
         # Set shipping zone ids and return it(Due to new WooCommerce REST API)
         zone_ids = list()
-        for zone in res: #name
+        for zone in res:  # name
             zone_ids.append(zone.get('id'))
         return zone_ids
 
@@ -119,7 +118,7 @@ class ShippingZoneAdapter(Component):
         data = {
             "shipping_zone": data
         }
-        return self._call('put', self._woo_model + "/" + str(id),  data)
+        return self._call('put', self._woo_model + "/" + str(id), data)
 
     def is_woo_record(self, woo_id, filters={}):
         """
@@ -128,4 +127,4 @@ class ShippingZoneAdapter(Component):
         @param: filters : Filters to check (json)
         @return: result : Response of Woocom (Boolean)
         """
-        return self._call('get',self._woo_model + '/' + str(woo_id), filters)
+        return self._call('get', self._woo_model + '/' + str(woo_id), filters)

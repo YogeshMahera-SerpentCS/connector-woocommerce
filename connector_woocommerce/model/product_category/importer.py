@@ -3,11 +3,11 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 # See LICENSE file for full copyright and licensing details.
 
-import logging
 import base64
-import urllib.request
-import urllib.error
+import logging
 
+import urllib.error
+import urllib.request
 from odoo.addons.component.core import Component
 from odoo.addons.connector.components.mapper import mapping
 from odoo.addons.connector.exception import MappingError
@@ -16,7 +16,6 @@ _logger = logging.getLogger(__name__)
 
 
 class CategoryBatchImporter(Component):
-
     """ Import the WooCommerce Product Categories.
 
     For every partner in the list, a delayed job is created.
@@ -35,7 +34,7 @@ class CategoryBatchImporter(Component):
         """ Run the synchronization """
         from_date = filters.pop('from_date', None)
         to_date = filters.pop('to_date', None)
-        #backend_adapter = self.component(usage='backend.adapter')
+        # backend_adapter = self.component(usage='backend.adapter')
         record_ids = self.backend_adapter.search(
             method='get',
             filters=filters,
@@ -51,17 +50,19 @@ class CategoryBatchImporter(Component):
         for ext_id in cat_rec:
             record.append(int(ext_id.external_id))
         # Get difference ids
-        diff = list(set(record)-set(record_ids))
+        diff = list(set(record) - set(record_ids))
         for del_woo_rec in diff:
-            woo_cat_id = category_ref.search([('external_id', '=', del_woo_rec)])
+            woo_cat_id = category_ref.search(
+                [('external_id', '=', del_woo_rec)])
             cat_id = woo_cat_id.odoo_id
-            odoo_cat_id = self.env['product.category'].search([('id', '=', cat_id.id)])
+            odoo_cat_id = self.env['product.category'].search(
+                [('id', '=', cat_id.id)])
             # Delete reference from odoo
             odoo_cat_id.write({
-            'woo_bind_ids': [(3, odoo_cat_id.woo_bind_ids[0].id)],
-            'sync_data': False,
-            'woo_backend_id': None
-        })
+                'woo_bind_ids': [(3, odoo_cat_id.woo_bind_ids[0].id)],
+                'sync_data': False,
+                'woo_backend_id': None
+            })
 
         _logger.info('search for woo Product Category %s returned %s',
                      filters, record_ids)
@@ -94,7 +95,7 @@ class ProductCategoryImporter(Component):
         """ Update an Odoo record """
         super(ProductCategoryImporter, self)._update(binding, data)
         # Adding updation checkpoint
-        #self.backend_record.add_checkpoint(binding)
+        # self.backend_record.add_checkpoint(binding)
         return
 
     def _before_import(self):

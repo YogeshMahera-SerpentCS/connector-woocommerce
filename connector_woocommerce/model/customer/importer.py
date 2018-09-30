@@ -4,15 +4,14 @@
 # See LICENSE file for full copyright and licensing details.
 
 import logging
+
 from odoo.addons.component.core import Component
-from odoo.addons.connector.exception import IDMissingInBackend
 from odoo.addons.connector.components.mapper import mapping
 
 _logger = logging.getLogger(__name__)
 
 
 class CustomerBatchImporter(Component):
-
     """ Import the WooCommerce Partners.
 
     For every partner in the list, a delayed job is created.

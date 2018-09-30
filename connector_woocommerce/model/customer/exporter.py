@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 # Copyright 2013-2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-import odoo
 
-from odoo import http
-from odoo.http import request
-
-from odoo.addons.website.models.website import Website
-from odoo.addons.connector.components.mapper import changed_by, mapping, only_create
-from odoo.addons.connector.exception import InvalidDataError
 from odoo.addons.component.core import Component
+from odoo.addons.connector.components.mapper import changed_by, mapping, \
+    only_create
+from odoo.addons.connector.exception import InvalidDataError
 
 
 class CustomerExporter(Component):
@@ -21,9 +17,9 @@ class CustomerExporter(Component):
     def _after_export(self):
         "After Import"
         self.binding.odoo_id.sudo().write({
-                        'sync_data': True,
-                        'woo_backend_id': self.backend_record.id
-                    })
+            'sync_data': True,
+            'woo_backend_id': self.backend_record.id
+        })
 
     def _validate_create_data(self, data):
         """ Check if the values to import are correct
@@ -35,9 +31,9 @@ class CustomerExporter(Component):
         """
         if not data.get('email'):
             raise InvalidDataError(
-                    "The partner does not have an email "
-                    "but it is mandatory for Woo"
-                )
+                "The partner does not have an email "
+                "but it is mandatory for Woo"
+            )
         if not data.get("shipping_address"):
             address = data.get("billing_address")
             address.pop('email')
@@ -106,10 +102,10 @@ class CustomerExportMapper(Component):
         data = {}
         partner_obj = self.env["res.partner"]
         ship_id = partner_obj.search([
-                                ('parent_id', '=', record.odoo_id.id),
-                                ('type', '=', 'delivery')],
-                                     limit=1,
-                                     order='write_date desc')
+            ('parent_id', '=', record.odoo_id.id),
+            ('type', '=', 'delivery')],
+            limit=1,
+            order='write_date desc')
         if ship_id:
             name = ship_id.name.split(" ")
             data.update({
@@ -121,7 +117,7 @@ class CustomerExportMapper(Component):
                 "city": ship_id.city,
                 "postcode": ship_id.zip,
                 "state": ship_id.state_id and ship_id.state_id.code or False,
-                "country": ship_id.country_id and ship_id.country_id.code\
-                 or False
+                "country": ship_id.country_id and ship_id.country_id.code or
+                False
             })
             return {'shipping_address': data}

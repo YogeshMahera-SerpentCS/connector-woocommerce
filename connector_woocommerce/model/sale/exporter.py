@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 # Copyright 2013-2017 Camptocamp SA
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl.html)
-import odoo
 
-from odoo import http
-from odoo.http import request
-
-from odoo.addons.website.models.website import Website
-from odoo.addons.connector.components.mapper import changed_by, mapping, only_create
-from odoo.addons.connector.exception import InvalidDataError
 from odoo.addons.component.core import Component
+from odoo.addons.connector.components.mapper import changed_by, mapping, \
+    only_create
 
 
 class SaleOrderExporter(Component):
@@ -21,9 +16,9 @@ class SaleOrderExporter(Component):
     def _after_export(self):
         """ After Export"""
         self.binding.odoo_id.sudo().write({
-                        'sync_data': True,
-                        'woo_backend_id': self.backend_record.id
-                    })
+            'sync_data': True,
+            'woo_backend_id': self.backend_record.id
+        })
         return
 
     def _validate_create_data(self, data):
@@ -46,18 +41,18 @@ class SaleOrderExporter(Component):
         # Export Customer
         if record.partner_id:
             self._export_dependency(
-                        record.partner_id,
-                        'woo.res.partner',
-                        component_usage='res.partner.exporter'
-                        )
+                record.partner_id,
+                'woo.res.partner',
+                component_usage='res.partner.exporter'
+            )
         # Export Products
         if record.order_line:
             for line in record.order_line:
                 self._export_dependency(
-                        line.product_id,
-                        'woo.product.product',
-                        component_usage='product.product.exporter'
-                        )
+                    line.product_id,
+                    'woo.product.product',
+                    component_usage='product.product.exporter'
+                )
         return
 
 
@@ -108,8 +103,8 @@ class SaleOrderExportMapper(Component):
             "city": shipping.city,
             "postcode": shipping.zip,
             "state": shipping.state_id and shipping.state_id.code or False,
-            "country": shipping.country_id and shipping.country_id.code\
-            or False
+            "country": shipping.country_id and shipping.country_id.code or
+            False
         })
         return {'shipping_address': data}
 
@@ -139,7 +134,7 @@ class SaleOrderExportMapper(Component):
                 items.append({
                     "product_id": product_id,
                     # SKU can be used instead of product_id, while mapping.
-                    #"sku": line.product_id.default_code,
+                    # "sku": line.product_id.default_code,
                     "quantity": line.product_uom_qty,
                     "total": line.price_unit
                 })

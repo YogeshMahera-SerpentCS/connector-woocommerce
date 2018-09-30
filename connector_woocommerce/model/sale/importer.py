@@ -26,13 +26,13 @@ class SaleOrderLineImportMapper(Component):
         binder = self.binder_for('woo.product.product')
         product_id = binder.to_internal(record['product_id'], unwrap=True)
         assert product_id is not None, (
-            "product_id %s should have been imported in "
-            "SaleOrderImporter._import_dependencies" % record['product_id'])
+                "product_id %s should have been imported in "
+                "SaleOrderImporter._import_dependencies" % record[
+                    'product_id'])
         return {'product_id': product_id.id}
 
 
 class SaleOrderBatchImporter(Component):
-
     """ Import the WooCommerce Partners.
 
     For every partner in the list, a delayed job is created.
@@ -204,7 +204,7 @@ class SaleOrderImportMapper(Component):
                             'state': rec['status'],
                             }
                 else:
-                    status_id = self.env['woo.sale.order.status'].sudo().\
+                    status_id = self.env['woo.sale.order.status'].sudo(). \
                         create({'name': rec['status']})
                     return {'status_id': status_id.id,
                             'state': rec['status'],
@@ -253,7 +253,7 @@ class SaleOrderImportMapper(Component):
                 # partner_dict.update({
                 #    'backend_id': self.backend_record.id,
                 #    'odoo_id': partner_id.id,
-                #})
+                # })
                 result = {'partner_id': partner_id.id}
             return result
 

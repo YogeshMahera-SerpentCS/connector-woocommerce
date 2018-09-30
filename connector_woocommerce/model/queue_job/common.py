@@ -7,7 +7,6 @@ from odoo import _, api, exceptions, models
 
 
 class QueueJob(models.Model):
-
     _inherit = 'queue.job'
 
     @api.multi
